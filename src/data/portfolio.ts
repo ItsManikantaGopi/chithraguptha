@@ -1,13 +1,13 @@
 export const profile = {
   name: "Manikanta Gopi",
-  role: "Software Engineer II",
+  role: "Senior Software Engineer",
   tagline: "Backend, platform and infrastructure engineering.",
   location: "Hyderabad, India",
   description:
     "Backend systems and the infrastructure they run on — a Rails monolith, Go and NestJS services, and a GitOps-managed Kubernetes fleet across AWS, GCP and Azure.",
   intro: [
     "I build the parts of a product that have to stay up.",
-    "For the last four years that has meant Praja — a regional social platform — where I've worked across a Ruby on Rails monolith, a set of Go and NestJS services around it, and the Kubernetes fleet all of it runs on. Roughly 1,700 merged pull requests, split fairly evenly between shipping features and keeping the platform standing under them.",
+    "For the last four years that has meant Praja — a regional social platform — where I've worked across a Ruby on Rails monolith, a set of Go and NestJS services around it, and the Kubernetes fleet all of it runs on. Along the way I've owned migrations, designed the release path, and shipped the infrastructure a paid tier depends on.",
     "I like the problems where the answer is a measurement rather than an opinion: which queue is actually the bottleneck, what the p90 really is, whether the new model is better or just different.",
   ],
   github: "https://github.com/ItsManikantaGopi",

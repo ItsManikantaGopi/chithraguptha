@@ -226,7 +226,7 @@ export const education = [
 ];
 
 export const writing = [
-  { title: "What 1,700 pull requests look like", slug: "what-1700-pull-requests-look-like" },
+  { title: "Keeping a large monolith habitable", slug: "what-1700-pull-requests-look-like" },
   { title: "Scale on the queue, not the CPU", slug: "scale-on-the-queue-not-the-cpu" },
   { title: "A better model made the product worse", slug: "a-better-model-made-the-product-worse" },
   { title: "Scaling, and the bottleneck you moved", slug: "scaling-and-the-bottleneck-you-moved" },

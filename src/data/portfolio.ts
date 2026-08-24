@@ -55,7 +55,7 @@ export const projects: Project[] = [
     slug: "realtime-messaging",
     title: "A real-time messaging service, and the parts that were hard",
     summary:
-      "NestJS and Socket.IO with Redis pub/sub for cross-instance fan-out and MongoDB for persistence. ~340 pull requests over three years — including adding a message broker and later removing it.",
+      "NestJS and Socket.IO with Redis pub/sub for cross-instance fan-out and MongoDB for persistence. Three years of ownership — including adding a message broker and later removing it.",
     period: "2023 – 2026",
     stack: ["NestJS", "Socket.IO", "Redis", "MongoDB", "BullMQ"],
     kind: "Backend",

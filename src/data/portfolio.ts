@@ -20,7 +20,7 @@ export const stats = [
   { value: "4 yrs", label: "back-end engineering", detail: "Dec 2021 → present" },
   { value: "24", label: "services on the fleet", detail: "GitOps-managed on AWS EKS" },
   { value: "3", label: "clouds worked across", detail: "AWS primary, GCP and Azure" },
-  { value: "0", label: "missed release windows", detail: "multi-cloud migration, live cutover" },
+  { value: "1", label: "zero-downtime migration", detail: "Azure AKS → AWS EKS, live cutover" },
 ];
 
 export type Project = {

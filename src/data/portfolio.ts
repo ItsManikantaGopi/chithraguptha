@@ -137,7 +137,7 @@ export const projects: Project[] = [
 export const roles = [
   {
     company: "Circleapp Online Services (Praja)",
-    title: "Software Engineer II",
+    title: "Senior Software Engineer",
     period: "Apr 2025 – Present",
     summary:
       "Platform and infrastructure ownership alongside product work: the Kubernetes fleet, the media generation pipeline, and the release path everything ships through.",

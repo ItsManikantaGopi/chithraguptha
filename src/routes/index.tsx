@@ -12,13 +12,13 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Manikanta Gopi — Backend & Platform Engineer" },
+      { title: "Manikanta Gopi — Senior Backend & Platform Engineer" },
       {
         name: "description",
         content:
-          "Portfolio of Manikanta Gopi, Software Engineer II in Hyderabad — Rails, Go and NestJS services on a GitOps-managed Kubernetes fleet across AWS, GCP and Azure.",
+          "Portfolio of Manikanta Gopi, Senior Software Engineer in Hyderabad — Rails, Go and NestJS services on a GitOps-managed Kubernetes fleet across AWS, GCP and Azure.",
       },
-      { property: "og:title", content: "Manikanta Gopi — Backend & Platform Engineer" },
+      { property: "og:title", content: "Manikanta Gopi — Senior Backend & Platform Engineer" },
       {
         property: "og:description",
         content:

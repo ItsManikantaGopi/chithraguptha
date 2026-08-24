@@ -1,13 +1,13 @@
 export const profile = {
   name: "Manikanta Gopi",
-  role: "Software Engineer II",
+  role: "Senior Software Engineer",
   tagline: "Backend, platform and infrastructure engineering.",
   location: "Hyderabad, India",
   description:
     "Backend systems and the infrastructure they run on — a Rails monolith, Go and NestJS services, and a GitOps-managed Kubernetes fleet across AWS, GCP and Azure.",
   intro: [
     "I build the parts of a product that have to stay up.",
-    "For the last four years that has meant Praja — a regional social platform — where I've worked across a Ruby on Rails monolith, a set of Go and NestJS services around it, and the Kubernetes fleet all of it runs on. Roughly 1,700 merged pull requests, split fairly evenly between shipping features and keeping the platform standing under them.",
+    "For the last four years that has meant Praja — a regional social platform — where I've worked across a Ruby on Rails monolith, a set of Go and NestJS services around it, and the Kubernetes fleet all of it runs on. Along the way I've owned migrations, designed the release path, and shipped the infrastructure a paid tier depends on.",
     "I like the problems where the answer is a measurement rather than an opinion: which queue is actually the bottleneck, what the p90 really is, whether the new model is better or just different.",
   ],
   github: "https://github.com/ItsManikantaGopi",
@@ -17,10 +17,10 @@ export const profile = {
 };
 
 export const stats = [
-  { value: "~1,700", label: "merged pull requests", detail: "across 15 repositories" },
-  { value: "4 yrs", label: "on one platform", detail: "Dec 2021 → present" },
+  { value: "4 yrs", label: "back-end engineering", detail: "Dec 2021 → present" },
   { value: "24", label: "services on the fleet", detail: "GitOps-managed on AWS EKS" },
   { value: "3", label: "clouds worked across", detail: "AWS primary, GCP and Azure" },
+  { value: "1", label: "zero-downtime migration", detail: "Azure AKS → AWS EKS, live cutover" },
 ];
 
 export type Project = {
@@ -46,7 +46,7 @@ export const projects: Project[] = [
     slug: "gitops-fleet",
     title: "Running a 24-service fleet from a Git repository",
     summary:
-      "Helm charts, per-environment values and automated image bumps describing every service in production. ~380 pull requests, most of them deliberately tiny.",
+      "Helm charts, per-environment values and automated image bumps describing every service in production — most changes deliberately small, so the tree stays reviewable.",
     period: "2024 – present",
     stack: ["Kubernetes", "Helm", "Flux", "ArgoCD", "KEDA", "Karpenter"],
     kind: "Infrastructure",
@@ -55,7 +55,7 @@ export const projects: Project[] = [
     slug: "realtime-messaging",
     title: "A real-time messaging service, and the parts that were hard",
     summary:
-      "NestJS and Socket.IO with Redis pub/sub for cross-instance fan-out and MongoDB for persistence. ~340 pull requests over three years — including adding a message broker and later removing it.",
+      "NestJS and Socket.IO with Redis pub/sub for cross-instance fan-out and MongoDB for persistence. Three years of ownership — including adding a message broker and later removing it.",
     period: "2023 – 2026",
     stack: ["NestJS", "Socket.IO", "Redis", "MongoDB", "BullMQ"],
     kind: "Backend",
@@ -137,7 +137,7 @@ export const projects: Project[] = [
 export const roles = [
   {
     company: "Circleapp Online Services (Praja)",
-    title: "Software Engineer II",
+    title: "Senior Software Engineer",
     period: "Apr 2025 – Present",
     summary:
       "Platform and infrastructure ownership alongside product work: the Kubernetes fleet, the media generation pipeline, and the release path everything ships through.",
@@ -226,7 +226,7 @@ export const education = [
 ];
 
 export const writing = [
-  { title: "What 1,700 pull requests look like", slug: "what-1700-pull-requests-look-like" },
+  { title: "Keeping a large monolith habitable", slug: "what-1700-pull-requests-look-like" },
   { title: "Scale on the queue, not the CPU", slug: "scale-on-the-queue-not-the-cpu" },
   { title: "A better model made the product worse", slug: "a-better-model-made-the-product-worse" },
   { title: "Scaling, and the bottleneck you moved", slug: "scaling-and-the-bottleneck-you-moved" },

@@ -46,7 +46,7 @@ export const projects: Project[] = [
     slug: "gitops-fleet",
     title: "Running a 24-service fleet from a Git repository",
     summary:
-      "Helm charts, per-environment values and automated image bumps describing every service in production. ~380 pull requests, most of them deliberately tiny.",
+      "Helm charts, per-environment values and automated image bumps describing every service in production — most changes deliberately small, so the tree stays reviewable.",
     period: "2024 – present",
     stack: ["Kubernetes", "Helm", "Flux", "ArgoCD", "KEDA", "Karpenter"],
     kind: "Infrastructure",

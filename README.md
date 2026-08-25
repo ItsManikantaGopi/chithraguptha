@@ -12,6 +12,7 @@ Chithraguptha is an anonymous confession and community-reflection experience ins
 - PostgreSQL persistence through Supabase.
 - Punya / Paapa reactions persisted with one reaction per Soul per confession.
 - Localized, India-region-aware seed content for Telugu, Hindi, Tamil, Kannada, Malayalam, Marathi, Bengali and English.
+- Seed/founding entries are explicitly marked in the database and are never counted as community deeds.
 - Moderation defaults to **OFF**. When enabled, new user confessions become `pending` and must be published or rejected by an admin.
 
 ## 1. Create the Supabase connection
@@ -30,9 +31,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxx
 
 Do **not** put a Supabase secret/service-role key in the browser. The application only needs the publishable key because the database is protected by RLS.
 
-Supabase's current Next.js guidance uses the project URL and publishable key for browser clients and recommends RLS for exposed tables: https://supabase.com/docs/guides/getting-started/quickstarts/nextjs
-
-## 2. Create the database
+## 2. Create/update the database
 
 Open **Supabase → SQL Editor** and run these scripts in order:
 
@@ -40,7 +39,12 @@ Open **Supabase → SQL Editor** and run these scripts in order:
 supabase/schema.sql
 supabase/0002_admin_settings.sql
 supabase/0003_seed-id-normalization.sql
+supabase/0004_distinguish_seed_entries.sql
 ```
+
+If you already ran the first three scripts on the MVP project, **do not recreate the tables**. Run only `supabase/0004_distinguish_seed_entries.sql`.
+
+The fourth migration adds `confessions.is_seed`, marks the existing foundation rows as seed data, and makes the database trigger force real user confessions to remain non-seed and use the user's actual public Soul ID.
 
 The first script creates:
 
@@ -53,8 +57,6 @@ The first script creates:
 - authentication trigger
 - moderation-status trigger
 - localized seed data
-
-The two follow-up scripts grant the admin settings update permission and normalize the seeded display IDs to five characters.
 
 The initial moderation setting is deliberately:
 

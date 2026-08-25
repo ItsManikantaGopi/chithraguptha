@@ -20,6 +20,7 @@ create table if not exists public.confessions (
   id uuid primary key default gen_random_uuid(),
   soul_id uuid references public.profiles(id) on delete cascade,
   display_soul text,
+  is_seed boolean not null default false,
   language text not null default 'en',
   region text not null default 'IN',
   category text not null,
@@ -40,7 +41,10 @@ create table if not exists public.reactions (
   unique (confession_id, soul_id)
 );
 
+alter table public.confessions add column if not exists is_seed boolean not null default false;
+
 create index if not exists confessions_feed_idx on public.confessions(status, language, region, created_at desc);
+create index if not exists confessions_feed_seed_idx on public.confessions(status, language, is_seed, created_at desc);
 create index if not exists confessions_soul_idx on public.confessions(soul_id, created_at desc);
 create index if not exists reactions_confession_idx on public.reactions(confession_id);
 
@@ -144,6 +148,6 @@ with seed(language, region, category, content) as (values
 ('bn','WB','Regret','আমি বন্ধুকে ক্ষমা চাইতে পারতাম, কিন্তু অহংকারকে আগে রাখলাম।'),
 ('en','IN','Deep Secret','I keep saying I am too busy, but sometimes I am simply avoiding the conversation I know I need to have.'),
 ('en','IN','Love','I stayed in a relationship longer than I should have because I was afraid of admitting that I had changed.'))
-insert into public.confessions (soul_id, display_soul, language, region, category, content, status)
-select null, 'SEED' || lpad(row_number() over (order by language, region)::text, 1, '0'), language, region, category, content, 'published'
+insert into public.confessions (soul_id, display_soul, is_seed, language, region, category, content, status)
+select null, null, true, language, region, category, content, 'published'
 from seed where not exists (select 1 from public.confessions);

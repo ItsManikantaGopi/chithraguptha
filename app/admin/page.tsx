@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Confession, Profile } from "@/lib/supabase/types";
 
 type AdminProfileRow = Pick<Profile, "id" | "soul_id" | "role" | "language" | "region" | "created_at">;
+type ModerationSettingRow = { moderation_enabled: boolean };
 
 export default function AdminPage() {
   const supabase = createClient();
@@ -45,7 +46,7 @@ export default function AdminPage() {
   }
 
   async function loadData() {
-    const [{ data: rows, error: rowsError }, { data: setting, error: settingError }] = await Promise.all([
+    const [{ data: rows, error: rowsError }, { data: rawSetting, error: settingError }] = await Promise.all([
       supabase
         .from("confessions")
         .select("id,soul_id,display_soul,language,region,category,content,status,created_at,updated_at,moderated_at,moderated_by")
@@ -57,6 +58,7 @@ export default function AdminPage() {
     if (rowsError) setMessage(rowsError.message);
     if (settingError) setMessage(settingError.message);
     setAll((rows as Confession[] | null) || []);
+    const setting = rawSetting as ModerationSettingRow | null;
     setModeration(Boolean(setting?.moderation_enabled));
   }
 

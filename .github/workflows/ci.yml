@@ -14,7 +14,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
-      - run: npm ci
+      # The committed lockfile is only a root manifest, not a complete npm v3 lock.
+      # Use npm install until a complete lockfile is generated.
+      - run: npm install
       - run: npm run lint
       - run: npm run build

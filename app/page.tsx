@@ -1,5 +1,5 @@
-import LedgerApp from "@/components/ledger-app";
+import LedgerAppV2 from "@/components/ledger-app-v2";
 
 export default function Home() {
-  return <LedgerApp />;
+  return <LedgerAppV2 />;
 }

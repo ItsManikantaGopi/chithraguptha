@@ -10,3 +10,27 @@ where soul_id is null
 
 create index if not exists confessions_feed_seed_idx
   on public.confessions(status, language, is_seed, created_at desc);
+
+-- Keep seed state and the public Soul identity authoritative at the database
+-- boundary. A browser must never be able to turn its own confession into seed data.
+create or replace function public.apply_moderation_status()
+returns trigger language plpgsql security definer set search_path = public
+as $$
+begin
+  if new.soul_id is not null and not public.is_admin() then
+    new.is_seed := false;
+    select p.soul_id into new.display_soul
+    from public.profiles p
+    where p.id = new.soul_id;
+
+    if exists (select 1 from public.app_settings where id = true and moderation_enabled = true) then
+      new.status := 'pending';
+    else
+      new.status := 'published';
+    end if;
+  end if;
+
+  new.updated_at := now();
+  return new;
+end;
+$$;

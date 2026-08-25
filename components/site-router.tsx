@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect} from "react";
+import {useEffect, useRef} from "react";
 import Link from "next/link";
 import {usePathname, useRouter} from "next/navigation";
 import ChithragupthaApp from "@/components/chithraguptha-app";
@@ -14,6 +14,7 @@ function pathForNav(index: number) {
 export default function SiteRouter() {
   const pathname = usePathname();
   const router = useRouter();
+  const syncing = useRef(false);
 
   useEffect(() => {
     const path = pathname.replace(/\/$/, "") || "/";
@@ -22,13 +23,17 @@ export default function SiteRouter() {
 
     const timer = window.setTimeout(() => {
       const buttons = document.querySelectorAll<HTMLButtonElement>(".cg-nav button");
-      buttons[index]?.click();
+      if (!buttons[index]) return;
+      syncing.current = true;
+      buttons[index].click();
+      window.setTimeout(() => { syncing.current = false; }, 0);
     }, 0);
 
     return () => window.clearTimeout(timer);
   }, [pathname]);
 
   function handleCapture(event: React.MouseEvent<HTMLDivElement>) {
+    if (syncing.current) return;
     const target = event.target as HTMLElement | null;
     const button = target?.closest<HTMLButtonElement>(".cg-nav button");
     if (!button) return;

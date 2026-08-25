@@ -6,6 +6,8 @@ import { Check, Eye, Flame, Loader2, LogOut, ShieldCheck, X } from "lucide-react
 import { createClient } from "@/lib/supabase/client";
 import type { Confession, Profile } from "@/lib/supabase/types";
 
+type AdminProfileRow = Pick<Profile, "id" | "soul_id" | "role" | "language" | "region" | "created_at">;
+
 export default function AdminPage() {
   const supabase = createClient();
   const [email, setEmail] = useState("");
@@ -16,12 +18,24 @@ export default function AdminPage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
 
-  useEffect(() => { bootstrap(); }, []);
+  useEffect(() => { void bootstrap(); }, []);
 
   async function bootstrap() {
     const { data } = await supabase.auth.getUser();
     if (!data.user) return;
-    const { data: p } = await supabase.from("profiles").select("id,soul_id,role,language,region,created_at").eq("id", data.user.id).maybeSingle();
+
+    const { data: rawProfile, error } = await supabase
+      .from("profiles")
+      .select("id,soul_id,role,language,region,created_at")
+      .eq("id", data.user.id)
+      .maybeSingle();
+
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    const p = rawProfile as AdminProfileRow | null;
     if (p?.role === "admin") {
       setProfile(p as Profile);
       await loadData();
@@ -31,17 +45,25 @@ export default function AdminPage() {
   }
 
   async function loadData() {
-    const [{ data: rows }, { data: setting }] = await Promise.all([
-      supabase.from("confessions").select("id,soul_id,display_soul,language,region,category,content,status,created_at,updated_at,moderated_at,moderated_by").order("created_at", { ascending: false }).limit(200),
+    const [{ data: rows, error: rowsError }, { data: setting, error: settingError }] = await Promise.all([
+      supabase
+        .from("confessions")
+        .select("id,soul_id,display_soul,language,region,category,content,status,created_at,updated_at,moderated_at,moderated_by")
+        .order("created_at", { ascending: false })
+        .limit(200),
       supabase.from("app_settings").select("moderation_enabled").eq("id", true).single(),
     ]);
-    setAll((rows as Confession[]) || []);
+
+    if (rowsError) setMessage(rowsError.message);
+    if (settingError) setMessage(settingError.message);
+    setAll((rows as Confession[] | null) || []);
     setModeration(Boolean(setting?.moderation_enabled));
   }
 
   async function login(event: FormEvent) {
     event.preventDefault();
-    setBusy(true); setMessage("");
+    setBusy(true);
+    setMessage("");
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error || !data.user) setMessage(error?.message || "Could not sign in.");
     else await bootstrap();
@@ -51,16 +73,25 @@ export default function AdminPage() {
   async function toggleModeration() {
     setBusy(true);
     const next = !moderation;
-    const { error } = await supabase.from("app_settings").update({ moderation_enabled: next, updated_at: new Date().toISOString() }).eq("id", true);
+    const { error } = await supabase
+      .from("app_settings")
+      .update({ moderation_enabled: next, updated_at: new Date().toISOString() })
+      .eq("id", true);
     if (error) setMessage(error.message);
-    else { setModeration(next); setMessage(next ? "Moderation is ON. New confessions will enter the queue." : "Moderation is OFF. New confessions publish immediately."); }
+    else {
+      setModeration(next);
+      setMessage(next ? "Moderation is ON. New confessions will enter the queue." : "Moderation is OFF. New confessions publish immediately.");
+    }
     setBusy(false);
   }
 
   async function moderate(id: string, status: "published" | "rejected") {
     setBusy(true);
     const { data: userData } = await supabase.auth.getUser();
-    const { error } = await supabase.from("confessions").update({ status, moderated_at: new Date().toISOString(), moderated_by: userData.user?.id ?? null }).eq("id", id);
+    const { error } = await supabase
+      .from("confessions")
+      .update({ status, moderated_at: new Date().toISOString(), moderated_by: userData.user?.id ?? null })
+      .eq("id", id);
     if (error) setMessage(error.message);
     else await loadData();
     setBusy(false);
@@ -70,11 +101,16 @@ export default function AdminPage() {
     if (!window.confirm("Remove this confession permanently?")) return;
     setBusy(true);
     const { error } = await supabase.from("confessions").delete().eq("id", id);
-    if (error) setMessage(error.message); else await loadData();
+    if (error) setMessage(error.message);
+    else await loadData();
     setBusy(false);
   }
 
-  async function logout() { await supabase.auth.signOut(); setProfile(null); setAll([]); }
+  async function logout() {
+    await supabase.auth.signOut();
+    setProfile(null);
+    setAll([]);
+  }
 
   if (!profile) return <main className="cg-admin-shell"><section className="cg-admin-card"><Link href="/" className="cg-admin-back">← Ledger</Link><div className="cg-eyebrow">Chithraguptha · Steward</div><h1>Moderation desk</h1><p className="cg-admin-copy">This private dashboard controls whether new confessions are published immediately or held for review. It is intentionally separate from the public Soul experience.</p><form onSubmit={login} className="cg-auth-form"><label>ADMIN EMAIL<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="admin@example.com"/></label><label>PASSWORD<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required/></label><button className="cg-primary" disabled={busy}>{busy ? <Loader2 className="cg-spin" size={15}/> : <ShieldCheck size={15}/>} Enter moderation desk</button></form>{message && <div className="cg-admin-message">{message}</div>}</section><style>{adminStyles}</style></main>;
 

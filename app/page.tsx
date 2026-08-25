@@ -1,6 +1,5 @@
-import "@/data/naraka-extension";
-import SiteRouter from "@/components/site-router";
+import LiveLedger from "@/components/live-ledger";
 
 export default function Home() {
-  return <SiteRouter />;
+  return <LiveLedger />;
 }

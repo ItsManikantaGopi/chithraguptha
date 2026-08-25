@@ -53,8 +53,7 @@ returns trigger language plpgsql security definer set search_path = public
 as $$
 begin
   insert into public.profiles (id, soul_id, role, language, region)
-  values (new.id, nullif(new.raw_user_meta_data ->> 'soul_id',''),
-    case when coalesce(new.raw_user_meta_data ->> 'role','user') = 'admin' then 'admin' else 'user' end,
+  values (new.id, nullif(new.raw_user_meta_data ->> 'soul_id',''), 'user',
     coalesce(new.raw_user_meta_data ->> 'language','en'), coalesce(new.raw_user_meta_data ->> 'region','IN'))
   on conflict (id) do nothing;
   return new;
@@ -69,11 +68,8 @@ returns trigger language plpgsql security definer set search_path = public
 as $$
 begin
   if new.soul_id is not null and not public.is_admin() then
-    if exists (select 1 from public.app_settings where id = true and moderation_enabled = true) then
-      new.status := 'pending';
-    else
-      new.status := 'published';
-    end if;
+    if exists (select 1 from public.app_settings where id = true and moderation_enabled = true) then new.status := 'pending';
+    else new.status := 'published'; end if;
   end if;
   new.updated_at := now();
   return new;
@@ -81,8 +77,7 @@ end;
 $$;
 
 drop trigger if exists confession_moderation_status on public.confessions;
-create trigger confession_moderation_status before insert or update on public.confessions
-for each row execute procedure public.apply_moderation_status();
+create trigger confession_moderation_status before insert or update on public.confessions for each row execute procedure public.apply_moderation_status();
 
 alter table public.profiles enable row level security;
 alter table public.app_settings enable row level security;
@@ -95,7 +90,7 @@ revoke all on public.confessions from anon;
 revoke all on public.reactions from anon;
 grant select on public.confessions to anon;
 grant select on public.reactions to anon;
-grant select, update on public.profiles to authenticated;
+grant select on public.profiles to authenticated;
 grant select on public.app_settings to authenticated;
 grant select, insert, update, delete on public.confessions to authenticated;
 grant select, insert, delete on public.reactions to authenticated;
@@ -126,12 +121,8 @@ create policy "users delete own reactions" on public.reactions for delete to aut
 
 drop policy if exists "users read own profile" on public.profiles;
 create policy "users read own profile" on public.profiles for select to authenticated using (id = auth.uid());
-drop policy if exists "users update own profile" on public.profiles;
-create policy "users update own profile" on public.profiles for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
 drop policy if exists "admins read profiles" on public.profiles;
 create policy "admins read profiles" on public.profiles for select to authenticated using ((select public.is_admin()));
-drop policy if exists "admins update profiles" on public.profiles;
-create policy "admins update profiles" on public.profiles for update to authenticated using ((select public.is_admin())) with check ((select public.is_admin()));
 
 drop policy if exists "authenticated read settings" on public.app_settings;
 create policy "authenticated read settings" on public.app_settings for select to authenticated using (true);

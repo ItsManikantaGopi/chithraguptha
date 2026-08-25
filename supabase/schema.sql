@@ -64,6 +64,26 @@ $$;
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created after insert on auth.users for each row execute procedure public.handle_new_user();
 
+create or replace function public.apply_moderation_status()
+returns trigger language plpgsql security definer set search_path = public
+as $$
+begin
+  if new.soul_id is not null and not public.is_admin() then
+    if exists (select 1 from public.app_settings where id = true and moderation_enabled = true) then
+      new.status := 'pending';
+    else
+      new.status := 'published';
+    end if;
+  end if;
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+drop trigger if exists confession_moderation_status on public.confessions;
+create trigger confession_moderation_status before insert or update on public.confessions
+for each row execute procedure public.apply_moderation_status();
+
 alter table public.profiles enable row level security;
 alter table public.app_settings enable row level security;
 alter table public.confessions enable row level security;
@@ -116,7 +136,6 @@ create policy "authenticated read settings" on public.app_settings for select to
 drop policy if exists "admins update settings" on public.app_settings;
 create policy "admins update settings" on public.app_settings for update to authenticated using ((select public.is_admin())) with check ((select public.is_admin()));
 
--- Localized, region-aware seed content for the first MVP feed.
 with seed(language, region, category, content) as (values
 ('te','AP','Career','మీటింగ్‌లో నేను పని పూర్తి చేశానని చెప్పాను. నిజానికి ఆ టికెట్‌ను ఇంకా ఓపెన్ కూడా చేయలేదు.'),
 ('te','TS','Regret','నాన్నతో చివరిసారి మాట్లాడినప్పుడు తొందరగా ఫోన్ పెట్టేశాను. ఆ చిన్న నిమిషం ఇప్పటికీ గుర్తొస్తుంది.'),

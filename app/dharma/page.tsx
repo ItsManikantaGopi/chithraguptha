@@ -1,6 +1,5 @@
-import "@/data/naraka-extension";
 import SiteRouter from "@/components/site-router";
 
-export default function Home() {
+export default function DharmaRoute() {
   return <SiteRouter />;
 }

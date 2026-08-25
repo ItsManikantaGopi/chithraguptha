@@ -16,7 +16,10 @@ function createSoulId() {
 }
 
 function authEmail(soulId: string) {
-  return `soul_${soulId.toLowerCase()}@${INTERNAL_DOMAIN}`;
+  // Keep the internal Auth address RFC-friendly. An underscore in the local
+  // part was rejected by Supabase's email validator in production, so use a
+  // dot separator while keeping the address completely opaque to the user.
+  return `soul.${soulId.toLowerCase()}@${INTERNAL_DOMAIN}`;
 }
 
 const pageStyles = `
@@ -51,24 +54,47 @@ export default function SoulLogin() {
 
   async function createSoul(passwordValue: string) {
     const supabase = createClient();
-    for (let attempt = 0; attempt < 5; attempt += 1) {
+
+    for (let attempt = 0; attempt < 8; attempt += 1) {
       const id = createSoulId();
       const { data, error } = await supabase.auth.signUp({
         email: authEmail(id),
         password: passwordValue,
         options: { data: { soul_id: id, language, region, role: "user" } },
       });
+
       if (!error && data.user) {
-        if (!data.session) throw new Error("Soul created but no session was returned. Disable email confirmation in Supabase Authentication for this MVP.");
-        setCreated(id);
-        setSoulId(id);
+        if (!data.session) {
+          throw new Error("Soul creation needs an active session. In Supabase, turn off email confirmation for this MVP because the internal Soul address cannot receive mail.");
+        }
+
+        // The profile trigger is the source of truth for the public Soul ID.
+        // Read it back before declaring creation successful so a missing SQL
+        // trigger cannot leave the user with an account but no visible Soul.
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("soul_id")
+          .eq("id", data.user.id)
+          .maybeSingle();
+
+        if (profileError) throw new Error(`Soul account created, but the profile could not be loaded: ${profileError.message}`);
+        if (!profile?.soul_id) {
+          throw new Error("Soul account was created, but its Soul ID was not recorded. Run the latest supabase/schema.sql trigger setup, then try again.");
+        }
+
+        setCreated(profile.soul_id);
+        setSoulId(profile.soul_id);
         setPassword("");
         setMode("return");
         setMessage("Your Soul is ready. Keep the five-character Soul ID and password safe.");
         return;
       }
+
+      // A collision is extremely unlikely, but the unique profile constraint
+      // means we can safely generate another five-character ID and retry.
       if (error && !/already registered|already exists/i.test(error.message)) throw error;
     }
+
     throw new Error("We could not find an unused Soul ID. Please try again.");
   }
 
@@ -83,6 +109,7 @@ export default function SoulLogin() {
         await createSoul(password);
         return;
       }
+
       const normalized = soulId.trim().replace(/^#/, "").toUpperCase();
       if (!/^[A-Z0-9]{5}$/.test(normalized)) throw new Error("Soul ID must be exactly 5 characters.");
       const { data, error } = await supabase.auth.signInWithPassword({ email: authEmail(normalized), password });

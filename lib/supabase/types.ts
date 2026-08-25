@@ -15,6 +15,7 @@ export type Confession = {
   id: string;
   soul_id: string | null;
   display_soul: string | null;
+  is_seed: boolean;
   language: Language;
   region: string;
   category: string;
@@ -72,6 +73,7 @@ export type Database = {
           id?: string;
           soul_id?: string | null;
           display_soul?: string | null;
+          is_seed?: boolean;
           language: Language;
           region: string;
           category: string;

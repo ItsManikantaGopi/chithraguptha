@@ -1,6 +1,6 @@
 import "@/data/naraka-extension";
-import LedgerAppV2 from "@/components/ledger-app-v2";
+import ChithragupthaApp from "@/components/chithraguptha-app";
 
 export default function Home() {
-  return <LedgerAppV2 />;
+  return <ChithragupthaApp />;
 }

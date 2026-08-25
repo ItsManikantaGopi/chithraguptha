@@ -30,19 +30,19 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxx
 
 Do **not** put a Supabase secret/service-role key in the browser. The application only needs the publishable key because the database is protected by RLS.
 
-Supabase's current Next.js guidance uses the project URL and publishable key for browser clients and recommends RLS for exposed tables. See the official docs: https://supabase.com/docs/guides/getting-started/quickstarts/nextjs
+Supabase's current Next.js guidance uses the project URL and publishable key for browser clients and recommends RLS for exposed tables: https://supabase.com/docs/guides/getting-started/quickstarts/nextjs
 
 ## 2. Create the database
 
-Open **Supabase → SQL Editor**, paste the complete contents of:
+Open **Supabase → SQL Editor** and run these scripts in order:
 
 ```text
 supabase/schema.sql
+supabase/0002_admin_settings.sql
+supabase/0003_seed-id-normalization.sql
 ```
 
-and run it once.
-
-This creates:
+The first script creates:
 
 - `profiles`
 - `app_settings`
@@ -53,6 +53,8 @@ This creates:
 - authentication trigger
 - moderation-status trigger
 - localized seed data
+
+The two follow-up scripts grant the admin settings update permission and normalize the seeded display IDs to five characters.
 
 The initial moderation setting is deliberately:
 
@@ -88,7 +90,7 @@ set role = 'admin'
 where id = 'AUTH_USER_UUID_HERE';
 ```
 
-The `profiles` trigger creates the profile automatically when the Auth user is created.
+The application deliberately ignores client-supplied `role` metadata, so a normal Soul cannot promote itself to administrator.
 
 Then open:
 

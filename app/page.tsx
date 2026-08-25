@@ -1,6 +1,6 @@
 import "@/data/naraka-extension";
-import ChithragupthaApp from "@/components/chithraguptha-app";
+import SiteRouter from "@/components/site-router";
 
 export default function Home() {
-  return <ChithragupthaApp />;
+  return <SiteRouter />;
 }

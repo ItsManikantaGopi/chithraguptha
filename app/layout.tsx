@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./cinematic-ui.css";
 
 export const metadata: Metadata = {
   title: "Chithraguptha — The Cosmic Ledger",
